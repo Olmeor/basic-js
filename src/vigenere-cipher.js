@@ -24,7 +24,7 @@ class VigenereCipheringMachine {
     this.direct = direct;
   }
 
-  encrypt(msg, key) {
+  cipher(rev, shft, msg, key) {
     if (!msg || !key) {
       throw new Error('Incorrect arguments!');
     }
@@ -38,8 +38,7 @@ class VigenereCipheringMachine {
     for (let i = 0; i < msgArr.length; i++) {
       let charPos = msgArr[i].charCodeAt(0);
       if (charPos >= 65 && charPos < 91) {
-        res.push(String.fromCharCode(startCode + (charPos - startCode + keyArr[count % keyArr.length]) % 26));
-        // res.push(String.fromCharCode(startCode + (charPos - startCode - keyArr[count % keyArr.length] + 26) % 26));
+        res.push(String.fromCharCode(startCode + (charPos - startCode + rev * keyArr[count % keyArr.length] + shft) % 26));
         count++;
       } else {
         res.push(msgArr[i]);
@@ -49,28 +48,16 @@ class VigenereCipheringMachine {
     return this.direct ? res.join('') : res.reverse().join('');
   }
 
+  encrypt(msg, key) {
+    let rev = 1;
+    let shft = 0;
+    return this.cipher(rev, shft, msg, key);
+  }
+
   decrypt(msg, key) {
-    if (!msg || !key) {
-      throw new Error('Incorrect arguments!');
-    }
-
-    let startCode = 65;
-    let count = 0;
-    let msgArr = msg.toUpperCase().split('');
-    let keyArr = key.toUpperCase().split('').map(char => char.charCodeAt(0) - startCode);
-    let res = [];
-
-    for (let i = 0; i < msgArr.length; i++) {
-      let charPos = msgArr[i].charCodeAt(0);
-      if (charPos >= 65 && charPos < 91) {
-        res.push(String.fromCharCode(startCode + (charPos - startCode - keyArr[count % keyArr.length] + 26) % 26));
-        count++;
-      } else {
-        res.push(msgArr[i]);
-      }
-    }
-
-    return this.direct ? res.join('') : res.reverse().join('');
+    let rev = -1;
+    let shft = 26;
+    return this.cipher(rev, shft, msg, key);
   }
 }
 
